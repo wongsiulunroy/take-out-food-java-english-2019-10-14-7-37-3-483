@@ -57,7 +57,7 @@ public class App {
     	OrderDetails += "-----------------------------------\n";
     	if (Promotion1Discount ==0 && Promotion2Discount ==0) {
     		OrderTotal = OrderWODiscount;
-    	} else if (Promotion2Discount>Promotion1Discount) {
+    	} else if (Promotion1Discount>Promotion2Discount) {
     		OrderDetails += "Promotion used:\n" + salesPromotionRepository.findAll().get(1).getDisplayName() + " ("+PromotionFoodCode+"), "+"saving " + Promotion2Discount + "yuan\n-----------------------------------\n";
     		OrderTotal = OrderWODiscount - Promotion2Discount;
     	} else {
