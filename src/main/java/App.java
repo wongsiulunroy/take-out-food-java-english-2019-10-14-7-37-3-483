@@ -14,7 +14,59 @@ public class App {
 
     public String bestCharge(List<String> inputs) {
         //TODO: write code here
+    	String OrderDetails = "============= Order details =============\\n";
+    	String PromotionFoodCode = null;
+    	int Promotion1Discount = 0;
+    	int Promotion2Discount = 0;
+    	int OrderWODiscount = 0;
+    	int OrderTotal = 0;
+    	List<String> PromotionList = salesPromotionRepository.findAll().get(1).getRelatedItems();
+    	
+    	for (String input : inputs) {
+    		String[] SplitItem = input.split("\\s+");
+    		int ItemCost = 0;
+    		String ItemID = SplitItem[0];
+    		String ItemName = null;
+    		int Quantity = Integer.parseInt(SplitItem[2]);
+    		
+    		for (Item item : itemRepository.findAll()) {
+    			if (item.getId().equals(ItemID)) {
+    				ItemName = item.getName();
+    				ItemCost = (int) item.getPrice();
+    				break;
+    			}
+    		}
+    		OrderWODiscount += Quantity * ItemCost;
+    		OrderDetails += ItemName + " x " + Quantity + " = " + OrderWODiscount + "yuan\n";
+    		
+    		if (OrderWODiscount >=30) {
+    			Promotion1Discount = 6;
+    		}
+    		
+    		if (PromotionList.contains(ItemID)) {
+    			if (PromotionFoodCode==null) {
+    				PromotionFoodCode = ItemName;
+    			} else {
+    				PromotionFoodCode += ", "+ ItemName;
+    			}
+    			Promotion2Discount += Quantity * ItemCost /2 ;
+    		}
+    		
+    	}
+    	
+    	OrderDetails += "-----------------------------------\n";
+    	if (Promotion1Discount ==0 && Promotion2Discount ==0) {
+    		OrderTotal = OrderWODiscount;
+    	} else if (Promotion2Discount>Promotion1Discount) {
+    		OrderDetails += "Promotion used:\n" + salesPromotionRepository.findAll().get(1).getDisplayName() + " ("+PromotionFoodCode+"), "+"saving " + Promotion2Discount + "yuan\n-----------------------------------\n";
+    		OrderTotal = OrderWODiscount - Promotion2Discount;
+    	} else {
+    		OrderDetails += "Promotion used:\n" + salesPromotionRepository.findAll().get(0).getDisplayName() +  ", saving " + Promotion1Discount + "yuan\n-----------------------------------\n";
+    		OrderTotal = OrderWODiscount - Promotion1Discount;
+    	}
+    	
+    	OrderDetails += "Total: " + OrderTotal +" yuan\n===================================";
 
-        return null;
+        return OrderDetails;
     }
 }
