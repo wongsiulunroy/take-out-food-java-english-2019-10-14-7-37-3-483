@@ -14,85 +14,74 @@ public class App {
 
     public String bestCharge(List<String> inputs) {
         //TODO: write code here
-    	String OrderDetails = "============= Order details =============\\n";
-    	String PromotionFoodCode = null;
-    	int Promotion1Discount = 0;
-    	int Promotion2Discount = 0;
-        int Promotion1Sum = 0;
-        int Promotion2Sum = 0;
-    	//int OrderWODiscount = 0;
-        int subtotal = 0;
-    	int OrderTotal = 0;
-        int FinalTotal = 0;
-    	List<String> PromotionList = salesPromotionRepository.findAll().get(1).getRelatedItems();
-    	
-    	for (String input : inputs) {
-    		String[] SplitItem = input.split("\\s");
-    		int ItemCost = 0;
-    		String ItemID = SplitItem[0];
-    		String ItemName = null;
-    		int Quantity = Integer.parseInt(SplitItem[2]);
-    		
-    		for (Item item : itemRepository.findAll()) {
-    			if (item.getId().equals(ItemID)) {
-    				ItemName = item.getName();
-    				ItemCost = (int) item.getPrice();
-                    subtotal = ItemCost * Quantity;
-                    OrderTotal = OrderTotal + subtotal;
-    				break;
-    			}
-    		}
-            
-            OrderDetails = OrderDetails + ItemName + " x " + Quantity + " = " + subtotal + " yuan\n";
-    		//OrderWODiscount += Quantity * ItemCost;
-    		//OrderDetails += ItemName + " x " + Quantity + " = " + OrderWODiscount + "yuan\n";
-    		
-    		//if (OrderWODiscount >=30) {
-    			//Promotion1Discount = 6;
-    		//}
-    		
-    		if (PromotionList.contains(ItemID)) {
-    			if (PromotionFoodCode==null) {
-    				PromotionFoodCode = ItemName;
-    			} else {
-    				PromotionFoodCode =PromotionFoodCode + ", "+ ItemName;
-                    System.out.println(PromotionFoodCode);
-    			}
-                Promotion1Discount = Promotion1Discount + ItemCost * Quantity /2;
-                Promotion1Sum = OrderTotal - Promotion1Discount;
-    			//Promotion2Discount += Quantity * ItemCost /2 ;
-    		}
-            
-            if (OrderTotal >= 30) {
-               Promotion2Discount = Promotion2Discount+ 6;
-               Promotion2Sum = OrderTotal - 6;
-            }
-            
-    		
-    	}
-    	
-    	OrderDetails += "-----------------------------------\n";
-    	if (Promotion1Discount ==0 && Promotion2Discount ==0) {
-    		//OrderTotal = OrderWODiscount;
-            FinalTotal = OrderTotal;
-            OrderDetails = OrderDetails +  "Total：" + FinalTotal + " yuan\n" +
-                    "===================================";
-    	} else if (Promotion1Discount>Promotion2Discount) {
-    		 OrderDetails = OrderDetails + "Promotion used:\n" + "Half price for certain dishes (" + PromotionFoodCode + ")，saving 13 yuan\n" +
-                    "-----------------------------------\n" +
-                    "Total：" + Promotion1Sum + " yuan\n" +
-                    "===================================";
-    		//OrderTotal = OrderWODiscount - Promotion2Discount;
-    	} else {
-    		OrderDetails = OrderDetails + "Promotion used:\n" + "满30减6 yuan，saving 6 yuan\n" +
-                    "-----------------------------------\n" +
-                    "Total：" + Promotion2Sum + " yuan\n" +
-                    "===================================";
-    		//OrderTotal = OrderWODiscount - Promotion1Discount;
-    	}
-    	
-    	//OrderDetails += "Total: " + OrderTotal +" yuan\n===================================";
 
-        return OrderDetails;
+        String msg = "============= Order details =============\n";
+        int subtotal = 0;
+        int total = 0;
+        int pro1_total = 0;
+        int pro1_save = 0;
+        int pro2_save = 0;
+        int pro2_total = 0;
+        int final_total = 0;
+        String pro_itemName = null;
+        List<String> PromotionItems = salesPromotionRepository.findAll().get(1).getRelatedItems();
+
+        for (String input : inputs) {
+            String[] item_split = input.split("\\s");
+            String itemName = null;
+            int itemPrice = 0;
+            String itemID = item_split[0];
+            int numOfItem = Integer.parseInt(item_split[2]);
+
+            //msg = msg + " " + itemID + " " + numOfItem;
+
+            for (Item list_items : itemRepository.findAll()) {
+                if (list_items.getId().equals(itemID)) {
+                    itemName = list_items.getName();
+                    itemPrice = (int) list_items.getPrice();
+                    subtotal = itemPrice * numOfItem;
+                    total = total + subtotal;
+                    break;
+                }
+            }
+            msg = msg + itemName + " x " + numOfItem + " = " + subtotal + " yuan\n";
+
+            if (PromotionItems.contains(itemID)) {
+                if (pro_itemName == null) {
+                    pro_itemName = itemName;
+                    //  break;
+                } else {
+                    pro_itemName = pro_itemName + "，" + itemName;
+                    System.out.println(pro_itemName);
+                }
+                pro1_save = pro1_save + itemPrice * numOfItem / 2;
+                pro1_total = total - pro1_save;
+            }
+
+            if (total >= 30) {
+                pro2_save = pro2_save + 6;
+                pro2_total = total - 6;
+            }
+
+        }
+
+        msg = msg + "-----------------------------------\n";
+        if (pro1_save == 0 && pro2_save == 0) {
+            final_total = total;
+            msg = msg + "Total：" + final_total + " yuan\n" +
+                    "===================================";
+        } else if (pro1_save > pro2_save) {
+            msg = msg + "Promotion used:\n" + "Half price for certain dishes (" + pro_itemName + ")，saving 13 yuan\n" +
+                    "-----------------------------------\n" +
+                    "Total：" + pro1_total + " yuan\n" +
+                    "===================================";
+        } else {
+            msg = msg + "Promotion used:\n" + "满30减6 yuan，saving 6 yuan\n" +
+                    "-----------------------------------\n" +
+                    "Total：" + pro2_total + " yuan\n" +
+                    "===================================";
+        }
+        
+        return msg;
     }
 }
