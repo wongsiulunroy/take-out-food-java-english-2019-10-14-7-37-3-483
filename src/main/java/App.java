@@ -20,7 +20,7 @@ public class App {
     	int Promotion2Discount = 0;
         int Promotion1Sum = 0;
         int Promotion2Sum = 0;
-    	int OrderWODiscount = 0;
+    	//int OrderWODiscount = 0;
         int subtotal = 0;
     	int OrderTotal = 0;
         int FinalTotal = 0;
@@ -38,7 +38,7 @@ public class App {
     				ItemName = item.getName();
     				ItemCost = (int) item.getPrice();
                     subtotal = ItemCost * Quantity;
-                    OrderTotal += subtotal;
+                    OrderTotal = OrderTotal + subtotal;
     				break;
     			}
     		}
@@ -55,7 +55,7 @@ public class App {
     			if (PromotionFoodCode==null) {
     				PromotionFoodCode = ItemName;
     			} else {
-    				PromotionFoodCode += ", "+ ItemName;
+    				PromotionFoodCode =PromotionFoodCode + ", "+ ItemName;
                     System.out.println(PromotionFoodCode);
     			}
                 Promotion1Discount = Promotion1Discount + ItemCost * Quantity /2;
@@ -64,7 +64,7 @@ public class App {
     		}
             
             if (OrderTotal >= 30) {
-               Promotion2Discount += 6;
+               Promotion2Discount = Promotion2Discount+ 6;
                Promotion2Sum = OrderTotal - 6;
             }
             
