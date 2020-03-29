@@ -18,8 +18,12 @@ public class App {
     	String PromotionFoodCode = null;
     	int Promotion1Discount = 0;
     	int Promotion2Discount = 0;
+        int Promotion1Sum = 0;
+        int Promotion2Sum = 0;
     	int OrderWODiscount = 0;
+        int subtotal = 0;
     	int OrderTotal = 0;
+        int FinalTotal = 0;
     	List<String> PromotionList = salesPromotionRepository.findAll().get(1).getRelatedItems();
     	
     	for (String input : inputs) {
@@ -33,39 +37,61 @@ public class App {
     			if (item.getId().equals(ItemID)) {
     				ItemName = item.getName();
     				ItemCost = (int) item.getPrice();
+                    subtotal = ItemCost * Quantity;
+                    OrderTotal += subtotal;
     				break;
     			}
     		}
-    		OrderWODiscount += Quantity * ItemCost;
-    		OrderDetails += ItemName + " x " + Quantity + " = " + OrderWODiscount + "yuan\n";
+            
+            OrderDetails = OrderDetails + ItemName + " x " + Quantity + " = " + subtotal + " yuan\n";
+    		//OrderWODiscount += Quantity * ItemCost;
+    		//OrderDetails += ItemName + " x " + Quantity + " = " + OrderWODiscount + "yuan\n";
     		
-    		if (OrderWODiscount >=30) {
-    			Promotion1Discount = 6;
-    		}
+    		//if (OrderWODiscount >=30) {
+    			//Promotion1Discount = 6;
+    		//}
     		
     		if (PromotionList.contains(ItemID)) {
     			if (PromotionFoodCode==null) {
     				PromotionFoodCode = ItemName;
     			} else {
     				PromotionFoodCode += ", "+ ItemName;
+                    System.out.println(PromotionFoodCode);
     			}
-    			Promotion2Discount += Quantity * ItemCost /2 ;
+                Promotion1Discount = Promotion1Discount + Quantity * ItemCost /2;
+                Promotion1Sum = OrderTotal - Promotion1Discount;
+    			//Promotion2Discount += Quantity * ItemCost /2 ;
     		}
+            
+              if (OrderTotal >= 30) {
+                Promotion2Discount += 6;
+                Promotion2Sum = OrderTotal - 6;
+            }
+            
     		
     	}
     	
     	OrderDetails += "-----------------------------------\n";
     	if (Promotion1Discount ==0 && Promotion2Discount ==0) {
-    		OrderTotal = OrderWODiscount;
+    		//OrderTotal = OrderWODiscount;
+            FinalTotal = OrderTotal;
+            OrderDetails = OrderDetails +  "Total：" + FinalTotal + " yuan\n" +
+                    "===================================";
     	} else if (Promotion1Discount>Promotion2Discount) {
-    		OrderDetails += "Promotion used:\n" + salesPromotionRepository.findAll().get(1).getDisplayName() + " ("+PromotionFoodCode+"), "+"saving " + Promotion2Discount + "yuan\n-----------------------------------\n";
-    		OrderTotal = OrderWODiscount - Promotion2Discount;
+    		 OrderDetails = OrderDetails + "Promotion used:\n" + "Half price for certain dishes (" + PromotionFoodCode + ")，saving 13 yuan\n" +
+                    "-----------------------------------\n" +
+                    "Total：" + Promotion1Discount + " yuan\n" +
+                    "===================================";
+    		//OrderTotal = OrderWODiscount - Promotion2Discount;
     	} else {
-    		OrderDetails += "Promotion used:\n" + salesPromotionRepository.findAll().get(0).getDisplayName() +  ", saving " + Promotion1Discount + "yuan\n-----------------------------------\n";
-    		OrderTotal = OrderWODiscount - Promotion1Discount;
+    		OrderDetails = OrderDetails + "Promotion used:\n" + "满30减6 yuan，saving 6 yuan\n" +
+                    "-----------------------------------\n" +
+                    "Total：" + Promotion2Discount + " yuan\n" +
+                    "===================================";
+    		//OrderTotal = OrderWODiscount - Promotion1Discount;
     	}
     	
-    	OrderDetails += "Total: " + OrderTotal +" yuan\n===================================";
+    	//OrderDetails += "Total: " + OrderTotal +" yuan\n===================================";
 
         return OrderDetails;
     }
