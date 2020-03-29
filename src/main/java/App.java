@@ -27,7 +27,7 @@ public class App {
     	List<String> PromotionList = salesPromotionRepository.findAll().get(1).getRelatedItems();
     	
     	for (String input : inputs) {
-    		String[] SplitItem = input.split("\\s+");
+    		String[] SplitItem = input.split("\\s");
     		int ItemCost = 0;
     		String ItemID = SplitItem[0];
     		String ItemName = null;
@@ -58,14 +58,14 @@ public class App {
     				PromotionFoodCode += ", "+ ItemName;
                     System.out.println(PromotionFoodCode);
     			}
-                Promotion1Discount = Promotion1Discount + Quantity * ItemCost /2;
+                Promotion1Discount = Promotion1Discount + ItemCost * Quantity /2;
                 Promotion1Sum = OrderTotal - Promotion1Discount;
     			//Promotion2Discount += Quantity * ItemCost /2 ;
     		}
             
-              if (OrderTotal >= 30) {
-                Promotion2Discount += 6;
-                Promotion2Sum = OrderTotal - 6;
+            if (OrderTotal >= 30) {
+               Promotion2Discount += 6;
+               Promotion2Sum = OrderTotal - 6;
             }
             
     		
@@ -80,13 +80,13 @@ public class App {
     	} else if (Promotion1Discount>Promotion2Discount) {
     		 OrderDetails = OrderDetails + "Promotion used:\n" + "Half price for certain dishes (" + PromotionFoodCode + ")，saving 13 yuan\n" +
                     "-----------------------------------\n" +
-                    "Total：" + Promotion1Discount + " yuan\n" +
+                    "Total：" + Promotion1Sum + " yuan\n" +
                     "===================================";
     		//OrderTotal = OrderWODiscount - Promotion2Discount;
     	} else {
     		OrderDetails = OrderDetails + "Promotion used:\n" + "满30减6 yuan，saving 6 yuan\n" +
                     "-----------------------------------\n" +
-                    "Total：" + Promotion2Discount + " yuan\n" +
+                    "Total：" + Promotion2Sum + " yuan\n" +
                     "===================================";
     		//OrderTotal = OrderWODiscount - Promotion1Discount;
     	}
